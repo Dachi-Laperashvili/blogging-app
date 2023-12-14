@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container border mb-5 rounded shadow-lg w-50" style="margin-top:90px">
+    <div>
+        <img class="img-fluid mt-2" alt="{{ post.image }}" src="/static/images/{{ post.image }}">
+    </div>
+    <div class="mt-3 text-center">
+        <div class="row">
+            <h1>{{ post.title }}</h1>
+        </div>
+    </div>
+    <div class="container mb-4">
+        <div class="row">
+            {{ post.content }}
+        </div>
+    </div>
+</div>
+    <div class="container border mb-5 rounded shadow-lg w-50">
+        {% if current_user.is_authenticated %}
+            <form class="mb-3" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="d-flex align-items-center mt-3 ">
+                    <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" src="/static/pfp/{{ current_user.picture }}" alt="{{ current_user.picture }}" title="{{ current_user.username }}">
+                    {{ form.message(class="form-control", placeholder=form.message.label.text) }}
+                    {{ form.comment(class="btn bg-primary mt-2 text-white m-2")}}
+                </div>
+            </form>
+            {% elif post.comments %}
+            <h1 class="text-center">Comments:</h1>
+        {% endif %}
+
+        <div class="row">
+            {% for comment in post.comments  %}
+                <div class="d-flex p-3 bg-body">
+                <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ comment.user.picture }}" src="/static/pfp/{{ comment.user.picture }}">
+                    <div class="border rounded bg-light d-block p-2 align-items-center">
+                       <h6>{{ comment.user.username }}</h6>
+                        <p class="mb-0" title="{{ comment.date.strftime('%B %d, %Y %H:%M ') }}">{{ comment.comment }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container border rounded shadow-lg w-50 mb-5" style="margin-top:100px">
+    <div class="border rounded shadow-lg row justify-content-center align-items-center">
+        <div class="col-md-6 text-center">
+            <img class="mt-3 rounded-circle" alt="{{ current_user.picture }}" src="/static/pfp/{{ current_user.picture }}" width="200px" height="200px">
+                <h1>{{ current_user.username }}</h1>
+                <p>Email: {{ current_user.email }}</p>
+                <p>Birthday: {{ current_user.birthday }}</p>
+        </div>
+        <div class="text-center">
+            <form class="m-3 text-center" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {{ form.username(class="form-control mt-4", placeholder=form.username.label.text) }}
+                {{ form.email(class="form-control mt-4", placeholder=form.email.label.text) }}
+                {{ form.password(class="form-control mt-4", placeholder=form.password.label.text) }}
+                {{ form.img(class="form-control mt-4", placeholder=form.img.label.text) }}
+                {{ form.birthday(class="form-control mt-4", placeholder=form.birthday.label.text) }}
+                {{ form.update(class="btn bg-primary mt-2 text-white")}}
+            </form>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

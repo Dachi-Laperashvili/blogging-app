@@ -1,0 +1,12 @@
+Flask
+Flask-Migrate
+Flask-Login
+psycopg2-binary
+python-dotenv
+python-slugify
+SQLAlchemy
+text-unidecode
+typing_extensions
+Werkzeug
+WTForms
+gunicorn

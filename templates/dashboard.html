@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block style %}
+    .items-image{
+        text-align:center;
+    }
+    a{
+        text-decoration: none;
+    }
+    .delete_cont {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content{
+        background-color:#fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 30%;
+    }
+    .cancel, .delete{
+        float: left;
+        width: 40%;
+    }
+{% endblock %}
+{% block content %}
+    {% set messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+                {% for category,message in messages %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                    </div>
+                {% endfor %}
+      {% endif %}
+    <div class="row mt-5">
+    {% for blog in blogs %}
+        <div class="col-xl-4 col-lg-6 col-md-6">
+        <div class="shadow p-3 my-5 bg-body rounded" style="height: 500px">
+            <div class="mb-3 d-flex justify-content-between">
+                <div class="user-info">
+                    <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ blog.user.picture }}" src="/static/pfp/{{ blog.user.picture }}">
+                    <small> {{ blog.user.username }}</small>
+                </div>
+                {% if current_user.is_authenticated and blog.user == current_user%}
+                <div class="dropdown">
+                    <i class="bi bi-three-dots-vertical"  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer"></i>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/edit/{{ blog.slug}}"><i class="bi bi-pencil"> Edit</i></a></li>
+                        <li><a class="dropdown-item" onclick="document.querySelector('.delete_cont').style.display= 'flex'" style="cursor:pointer">
+                            <i class="bi bi-trash3-fill"> Delete</i>
+                        </a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="items-image">
+                <a class="text-black" href="/home/{{ blog.slug }}"><img  height="200px" width="100%" src="/static/images/{{ blog.image }}" alt="{{ blog.image }}"></a>
+            </div>
+            <div class="items-content">
+                <h2 class="text-center"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title}}</a></h2>
+                <br> <small>Created at: {{ blog.date.strftime('%B %d, %Y %H:%M ')}}</small>
+                <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
+            </div>
+            <div class="my-4">
+                <i class="fa-solid fa-thumbs-up"></i> {{ blog.likes }}
+            </div>
+        </div>
+            <div class="delete_cont">
+                <div class="modal-content border rounded">
+                    <div class="delete_txt px-2 pb-4 pt-3">
+                        <h3>Delete Blog?</h3>
+                    </div>
+                    <div class="px-2">
+                        <p>This will delete blog</p>
+                    </div>
+                    <div>
+                      <button class="cancel btn btn-light border m-2" onclick="document.querySelector('.delete_cont').style.display = 'none'">
+                        Cancel
+                      </button>
+                      <button class="delete btn btn-danger border m-2"><a class="text-white" href='/delete/{{ blog.slug }}'>Delete</a></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {% if blogs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="/dashboard/{{ blogs.prev_num }}">Previous</a>
+                </li>
+            {% endif %}
+            {% for page in blogs.iter_pages(left_edge=2, left_current=1,right_current=1, right_edge= 2) %}
+                 <li class="page-item {% if page_id == page %} active {% endif %}" {% if page == None %} style="display:none" {% endif %}>
+                     <a class="page-link" href="/dashboard/{{ page }}">{{ page }}</a>
+                 </li>
+            {% endfor %}
+            {% if blogs.has_next %}
+                <li class="page-item">
+                <a class="page-link" href="/dashboard/{{ blogs.next_num }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock %}
