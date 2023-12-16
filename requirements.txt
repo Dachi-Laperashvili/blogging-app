@@ -20,4 +20,5 @@ text-unidecode
 typing_extensions
 Werkzeug
 WTForms
+email_validator
 gunicorn
