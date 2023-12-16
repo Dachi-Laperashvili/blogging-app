@@ -77,7 +77,7 @@
                     </div>
                 {% endfor %}
       {% endif %}
-    <h1 class="mt-5 text-center">Recent Posts:</h1>
+    <h1 class="mt-5 text-center">Popular Blogs:</h1>
     <div class="row">
     {% for blog in blogs %}
         <div class="col-xl-4 col-lg-6 col-md-6">
@@ -103,12 +103,15 @@
                 <a class="text-black" href="/home/{{ blog.slug }}"><img  height="200px" width="100%" src="/static/images/{{ blog.image }}" alt="{{ blog.image }}"></a>
             </div>
             <div class="items-content">
-                <h2 class="text-center" style="font-size:1.7rem"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title[:20]}}</a></h2>
-                <br> <small>Created at: {{ blog.date.strftime('%B %d, %Y %H:%M ')}}</small>
-                <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
-            </div>
-           <div class="my-3">
-            <i class="fa-solid fa-thumbs-up"></i> {{ blog.likes }}
+                    <h2 class="text-center" style="font-size:1.7rem"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title[:20]}}</a></h2>
+                    <br> <small>Created at: {{ blog.date.strftime('%B %d, %Y %H:%M ')}}</small>
+                    <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
+                    <div class="my-3">
+                        <button class="like-btn btn border" data-blog-slug="{{ blog.slug }}">
+                            <i class="fa-regular fa-thumbs-up likeIcon"></i>
+                            <span class="like-count">{{ blog.likes }}</span>
+                     </button>
+                    </div>
             </div>
         </div>
             <div class="delete_cont">
@@ -130,6 +133,4 @@
         </div>
     {% endfor %}
     </div>
-    <script>
-    </script>
 {% endblock %}

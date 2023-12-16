@@ -1,4 +1,4 @@
-from flask import render_template, redirect, flash
+from flask import render_template, redirect, flash, request, jsonify
 from forms import SignUp, Login, AddBlog, EditBlog, EditUser, AddComment
 from slugify import slugify
 from extensions import app, db
@@ -60,7 +60,7 @@ def signup():
 
 @app.route('/')
 def home():
-    blogs = Blog.query.order_by(Blog.date.desc()).paginate(per_page=6)
+    blogs = Blog.query.order_by(Blog.likes.desc()).paginate(per_page=6)
     return render_template("index.html", blogs=blogs)
 
 
@@ -183,3 +183,29 @@ def profile():
 def my_blogs():
     user_blogs = Blog.query.filter_by(user_id=current_user.id).order_by(Blog.date.desc()).all()
     return render_template("my_blogs.html", user_blogs=user_blogs)
+
+
+@app.route('/like/<slug>', methods=['POST'])
+@login_required
+def like_unlike(slug):
+    blog = Blog.query.filter_by(slug=slug).first()
+    if blog:
+        if request.method == 'POST':
+            is_liked = request.form.get('is_liked')
+            print(is_liked)
+            if is_liked != "true":
+                blog.add_like(current_user)
+            else:
+                blog.remove_like(current_user)
+            return jsonify({"likes": blog.likes, 'liked': current_user in blog.liked_by})
+    return jsonify({'error': 'Invalid Request'})
+
+
+@app.route('/home/<blog_slug>/delete/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(blog_slug, comment_id):
+    comment = Comment.query.get(comment_id)
+    if comment and comment.user_id == current_user.id:
+        db.session.delete(comment)
+        db.session.commit()
+    return redirect("/home/" + blog_slug)

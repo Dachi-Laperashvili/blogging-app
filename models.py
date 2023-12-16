@@ -1,8 +1,14 @@
 from datetime import datetime
 
 from extensions import db, app, login_manager
-from flask_login import UserMixin, current_user
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+
+liked_blogs = db.Table(
+    'liked_blogs',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('blog_id', db.Integer, db.ForeignKey('blog.id'), primary_key=True)
+)
 
 
 class User(db.Model, UserMixin):
@@ -43,7 +49,7 @@ class Blog(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='blogs')
     likes = db.Column(db.Integer, default=0)
-    liked_by = db.relationship('User', backref='liked_blogs')
+    liked_by = db.relationship('User', secondary=liked_blogs, backref='liked_blogs')
 
     def __init__(self, title, slug, content, image, user_id):
         self.title = title
@@ -52,15 +58,15 @@ class Blog(db.Model):
         self.user_id = user_id
         self.image = image
 
-    def add_like(self):
-        if current_user not in self.liked_by:
-            self.liked_by.append(current_user)
+    def add_like(self, user):
+        if user not in self.liked_by:
+            self.liked_by.append(user)
             self.likes += 1
             db.session.commit()
 
-    def remove_like(self):
-        if current_user in self.liked_by:
-            self.liked_by.remove(current_user)
+    def remove_like(self, user):
+        if user in self.liked_by:
+            self.liked_by.remove(user)
             self.likes -= 1
             db.session.commit()
 
