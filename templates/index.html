@@ -81,8 +81,8 @@
     <div class="row">
     {% for blog in blogs %}
         <div class="col-xl-4 col-lg-6 col-md-6">
-        <div class="shadow p-3 my-5 bg-body rounded" style="height: 500px">
-            <div class="mb-3 d-flex justify-content-between">
+        <div class="shadow p-3 my-5 bg-body rounded" style="height: 500px;">
+            <div class="mb-3 d-flex justify-content-between" >
                 <div class="user-info">
                     <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ blog.user.picture }}" src="/static/pfp/{{ blog.user.picture }}">
                     <small> {{ blog.user.username }}</small>
@@ -103,12 +103,12 @@
                 <a class="text-black" href="/home/{{ blog.slug }}"><img  height="200px" width="100%" src="/static/images/{{ blog.image }}" alt="{{ blog.image }}"></a>
             </div>
             <div class="items-content">
-                <h2 class="text-center"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title}}</a></h2>
+                <h2 class="text-center" style="font-size:1.7rem"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title[:20]}}</a></h2>
                 <br> <small>Created at: {{ blog.date.strftime('%B %d, %Y %H:%M ')}}</small>
                 <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
             </div>
-           <div class="my-4">
-            <i class="fa-solid fa-thumbs-up" onclick="blog.add_like()"></i> {{ blog.likes }}
+           <div class="my-3">
+            <i class="fa-solid fa-thumbs-up"></i> {{ blog.likes }}
             </div>
         </div>
             <div class="delete_cont">

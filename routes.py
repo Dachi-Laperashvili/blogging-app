@@ -145,7 +145,7 @@ def edit_blog(blog_slug):
             return redirect('/')
         form.title.data = blog.title
         form.slug.data = blog.slug
-        form.content.data = blog.slug
+        form.content.data = blog.content
         return render_template("edit_blog.html", form=form)
     else:
         flash("You should be creator of the blog to edit it!", category="danger")

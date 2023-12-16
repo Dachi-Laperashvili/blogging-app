@@ -7,11 +7,10 @@ import os
 
 app = Flask(__name__)
 load_dotenv()
-db_url = os.getenv("DATABASE_URL")
 key = os.getenv("SECRET_KEY")
 
 app.config['SECRET_KEY'] = key
-app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///blog.db"
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)

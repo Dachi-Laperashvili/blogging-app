@@ -64,7 +64,7 @@
                 <a class="text-black" href="/home/{{ blog.slug }}"><img  height="200px" width="100%" src="/static/images/{{ blog.image }}" alt="{{ blog.image }}"></a>
             </div>
             <div class="items-content">
-                <h2 class="text-center"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title}}</a></h2>
+                <h2 class="text-center" style="font-size:1.7rem"><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.title[:20]}}</a></h2>
                 <br> <small>Created at: {{ blog.date.strftime('%B %d, %Y %H:%M ')}}</small>
                 <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
             </div>
