@@ -1,6 +1,7 @@
 Flask
 Flask-Migrate
 Flask-Login
+Flask-WTF
 psycopg2-binary
 python-dotenv
 python-slugify
