@@ -208,4 +208,4 @@ def delete_comment(blog_slug, comment_id):
     if comment and comment.user_id == current_user.id:
         db.session.delete(comment)
         db.session.commit()
-    return redirect("/home/" + blog_slug)
+    return redirect(f"/home/{blog_slug}")

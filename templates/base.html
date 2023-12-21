@@ -24,22 +24,10 @@
     $(document).ready(function(){
         const likeBtn = $('.like-btn');
 
-        likeBtn.each(function(){
-            const $this = $(this);
-            const slug = $this.data('blog-slug');
-            const likeIcon = $this.find('.likeIcon');
-
-            if(localStorage.getItem(`liked-${slug}`) === 'true'){
-                $this.addClass('liked');
-                likeIcon.addClass('fa-solid');
-            }
-        });
-
         likeBtn.on('click', function(){
             const slug = $(this).data('blog-slug')
             const likeCountElement = $(this).find('.like-count')
             const isLiked = $(this).hasClass('liked')
-            const likeIcon = $(this).find('i')
             const $this = $(this);
 
             $.ajax({
@@ -50,12 +38,8 @@
                     likeCountElement.text(response.likes);
                     if(response.liked){
                         $this.addClass('liked');
-                        likeIcon.addClass('fa-solid');
-                        localStorage.setItem(`liked-${slug}`, 'true');
                     }else{
                         $this.removeClass('liked');
-                        likeIcon.removeClass('fa-solid');
-                        localStorage.removeItem(`liked-${slug}`);
                     }
                 },
                 error: function(error){
