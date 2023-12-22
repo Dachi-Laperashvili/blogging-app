@@ -108,7 +108,11 @@
                     <br/><a class="text-black" href="/home/{{ blog.slug }}">{{ blog.content[:100] }}...</a>
                     <div class="my-3">
                         <button class="like-btn btn border" data-blog-slug="{{ blog.slug }}">
+                            {% if current_user in blog.liked_by %}
+                            <i class="fa-solid fa-thumbs-up likeIcon"></i>
+                            {% else %}
                             <i class="fa-regular fa-thumbs-up likeIcon"></i>
+                            {% endif %}
                             <span class="like-count">{{ blog.likes }}</span>
                      </button>
                     </div>

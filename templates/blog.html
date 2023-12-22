@@ -43,7 +43,11 @@
         </div>
         <div class="my-3">
             <button class="like-btn btn border" data-blog-slug="{{ post.slug }}">
-                <i class="fa-regular fa-thumbs-up likeIcon"></i>
+                   {% if current_user in post.liked_by %}
+                       <i class="fa-solid fa-thumbs-up likeIcon"></i>
+                   {% else %}
+                       <i class="fa-regular fa-thumbs-up likeIcon"></i>
+                   {% endif %}
                 <span class="like-count">{{ post.likes }}</span>
             </button>
         </div>
@@ -94,7 +98,7 @@
                     </div>
                     <div>
                         <form action="/home/{{ post.slug }}/delete/{{ comment.id }}" method="POST">
-                            <button type="button" class="cancel btn btn-light border m-2" onclick="document.querySelector('.delete_cont').style.display = 'none'">
+                            <button type="button" class="cancel btn btn-light border m-2" onclick="document.querySelector('#delete_{{ comment.id }}').style.display = 'none'">
                                 Cancel
                             </button>
                             <button class="delete btn btn-danger border m-2" type="submit">Delete</button>

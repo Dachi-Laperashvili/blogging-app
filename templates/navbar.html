@@ -1,11 +1,12 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">Blogging</a>
+    <a class="navbar-brand mt-2" href="https://www.tbceducation.ge/" target="_blank"><img alt="TBC Edu" src="/static/images/tbc.png" style="height:45px; width:45px;"> TBC</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
         <li class="nav-item">
           <a class="nav-link" href="/dashboard/1">Dashboard</a>
         </li>
@@ -17,7 +18,11 @@
               <a class="nav-link" href="/my_blogs">My Blogs</a>
             </li>
               </ul>
-        <ul class="nav navbar-nav navbar-right">
+              <form class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+              </form>
+        <ul class="nav navbar-nav navbar-right mx-2">
                 <li class="nav-item"><a href="/profile" class="nav-link"><i class="fa-solid fa-user"></i> Account</a></li>
                 <li class="nav-item"><a href="/logout" class="nav-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
         {% else %}

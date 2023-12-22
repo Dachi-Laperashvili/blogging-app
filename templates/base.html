@@ -38,8 +38,10 @@
                     likeCountElement.text(response.likes);
                     if(response.liked){
                         $this.addClass('liked');
+                        $this.find('i').removeClass('fa-regular').addClass('fa-solid');
                     }else{
                         $this.removeClass('liked');
+                        $this.find('i').removeClass('fa-solid').addClass('fa-regular');
                     }
                 },
                 error: function(error){
