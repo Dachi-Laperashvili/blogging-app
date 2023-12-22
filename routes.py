@@ -209,3 +209,10 @@ def delete_comment(blog_slug, comment_id):
         db.session.delete(comment)
         db.session.commit()
     return redirect(f"/home/{blog_slug}")
+
+
+@app.route('/search/<int:page_id>')
+def search(page_id=1):
+    name = request.args['search']
+    blogs = Blog.query.filter(Blog.title.ilike(f"%{name}%")).paginate(per_page=6, page=page_id)
+    return render_template("results.html", blogs=blogs, page_id=page_id)

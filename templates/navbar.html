@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand mt-2" href="https://www.tbceducation.ge/" target="_blank"><img alt="TBC" src="/static/images/tbc.png" style="height:45px; width:45px;"></a>
+    <a class="navbar-brand" href="https://www.tbceducation.ge/" target="_blank"><img alt="TBC" src="/static/images/tbc.png" style="height:45px; width:45px;"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -18,9 +18,9 @@
               <a class="nav-link" href="/my_blogs">My Blogs</a>
             </li>
               </ul>
-              <form class="d-flex" role="search">
-                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                  <button class="btn btn-outline-success" type="submit">Search</button>
+              <form action="/search/1" class="d-flex" role="search">
+                  <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search" id="searchInput">
+                  <button class="btn btn-outline-success" type="submit" id="searchBtn">Search</button>
               </form>
         <ul class="nav navbar-nav navbar-right mx-2">
                 <li class="nav-item"><a href="/profile" class="nav-link"><i class="fa-solid fa-user"></i> Account</a></li>
