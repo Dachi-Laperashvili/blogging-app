@@ -48,7 +48,7 @@
                     <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ blog.user.picture }}" src="/static/pfp/{{ blog.user.picture }}">
                     <small> {{ blog.user.username }}</small>
                 </div>
-                {% if current_user.is_authenticated and blog.user == current_user%}
+                {% if current_user.is_authenticated and blog.user == current_user or current_user.role == "admin"%}
                 <div class="dropdown">
                     <i class="bi bi-three-dots-vertical"  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer"></i>
                     <ul class="dropdown-menu">

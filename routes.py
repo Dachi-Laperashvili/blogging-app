@@ -79,7 +79,7 @@ def create():
 
         form.img.data.save((path.join(app.root_path, 'static/images', random_name)))
         new_blog = Blog(title=form.title.data, slug=slugify(form.slug.data),
-                        content=form.content.data, user_id=current_user.id, image=random_name)
+                        content=form.content.data, user_id=current_user.id, image=f"{random_name}.jpg")
 
         existing_blog = Blog.query.filter(Blog.slug == new_blog.slug).first()
         if existing_blog:
@@ -112,7 +112,7 @@ def view_blog(blog_slug):
 @login_required
 def delete_blog(blog_slug):
     blog = Blog.query.filter(Blog.slug == blog_slug).first()
-    if blog and blog.user_id == current_user.id:
+    if blog and blog.user_id == current_user.id or current_user.role == "admin":
         db.session.delete(blog)
         db.session.commit()
         flash("Blog Has Been Deleted!", category="warning")
@@ -205,7 +205,7 @@ def like_unlike(slug):
 @login_required
 def delete_comment(blog_slug, comment_id):
     comment = Comment.query.get(comment_id)
-    if comment and comment.user_id == current_user.id:
+    if comment and comment.user_id == current_user.id or current_user.role == "admin":
         db.session.delete(comment)
         db.session.commit()
     return redirect(f"/home/{blog_slug}")

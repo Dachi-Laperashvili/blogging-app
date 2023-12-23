@@ -31,14 +31,6 @@
     }
 {% endblock %}
 {% block content %}
-     {% set messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-                {% for category,message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                    {{ message }}
-                    </div>
-                {% endfor %}
-      {% endif %}
     <div class="row mt-5">
     {% for blog in blogs %}
         <div class="col-xl-4 col-lg-6 col-md-6">

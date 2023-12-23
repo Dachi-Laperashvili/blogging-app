@@ -25,10 +25,17 @@
         <ul class="nav navbar-nav navbar-right mx-2">
                 <li class="nav-item"><a href="/profile" class="nav-link"><i class="fa-solid fa-user"></i> Account</a></li>
                 <li class="nav-item"><a href="/logout" class="nav-link"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+              </ul>
         {% else %}
-                  <li class="nav-item"><a href="/login" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+              </ul>
+                  <form action="/search/1" class="d-flex" role="search">
+                      <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search" id="searchInput">
+                      <button class="btn btn-outline-success" type="submit" id="searchBtn">Search</button>
+                  </form>
+               <ul class="nav navbar-nav navbar-right mx-2">
+              <li class="nav-item"><a href="/login" class="nav-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+              </ul>
         {% endif %}
-      </ul>
     </div>
   </div>
 </nav>
