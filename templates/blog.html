@@ -28,8 +28,8 @@
     }
 {% endblock %}
 {% block content %}
-<div class="container border mb-5 rounded shadow-lg w-50" style="margin-top:90px">
-    <div>
+<div class="container border rounded mb-5 w-50" style="margin-top:90px">
+    <div >
         <img class="img-fluid mt-2" alt="{{ post.image }}" src="/static/images/{{ post.image }}">
     </div>
     <div class="mt-3 text-center">
@@ -59,7 +59,7 @@
                 {{ form.hidden_tag() }}
                 <div class="d-flex align-items-center mt-3 ">
                     <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" src="/static/pfp/{{ current_user.picture }}" alt="{{ current_user.picture }}" title="{{ current_user.username }}">
-                    {{ form.message(class="form-control", placeholder=form.message.label.text) }}
+                    {{ form.message(class="form-control", placeholder=form.message.label.text,autocomplete="off") }}
                     {{ form.comment(class="btn bg-primary mt-2 text-white m-2")}}
                 </div>
             </form>
@@ -68,45 +68,149 @@
         {% endif %}
 
         <div class="row">
-            {% for comment in post.comments  %}
+            {% for comment in comments  %}
                 <div class="d-flex p-3 bg-body">
-                <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ comment.user.picture }}" src="/static/pfp/{{ comment.user.picture }}">
+                    <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ comment.user.picture }}" src="/static/pfp/{{ comment.user.picture }}">
                     <div class="d-flex align-items-center justify-content-between border rounded bg-light d-block p-2 align-items-center">
                         <div class="flex-column">
-                            <h6>{{ comment.user.username }}</h6>
+                            <h6 class="mb-3">{{ comment.user.username }}</h6>
                             <p class="mb-0" title="{{ comment.date.strftime('%B %d, %Y %H:%M ') }}">{{ comment.comment }}</p>
                         </div>
-                        {% if current_user.id == comment.user_id or current_user.role == "admin"%}
-                        <div class="dropdown mb-5">
-                            <i class="fa-solid fa-ellipsis"  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer"></i>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" onclick="document.querySelector('#delete_{{ comment.id }}').style.display= 'flex'" style="cursor:pointer">
-                                    <i class="bi bi-trash3-fill"></i> Delete
-                                </a></li>
+                        <div class="flex-column">
+                            <ul class="list-unstyled d-flex m-0">
+                                {% if current_user.is_authenticated %}
+                                    <li class="pb-5 mx-2" style="cursor:pointer;" onclick="showReply({{ comment.id }})">
+                                        <i class="fa-solid fa-reply" title="reply"></i>
+                                    </li>
+                                {% endif %}
+                                {% if current_user.id == comment.user_id or current_user.role == "admin"%}
+                                    <li>
+                                        <div class="dropdown mb-5">
+                                            <i class="fa-solid fa-ellipsis"  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer"></i>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" onclick="document.querySelector('#delete_{{ comment.id }}').style.display= 'flex'" style="cursor:pointer">
+                                                    <i class="bi bi-trash3-fill"></i> Delete
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
-                <div class="delete_cont" id="delete_{{ comment.id }}">
-                <div class="modal-content border rounded">
-                    <div class="delete_txt px-2 pb-4 pt-3">
-                        <h3>Delete Comment?</h3>
+                {% if current_user.is_authenticated %}
+                    <form class="reply-form" id="reply_{{ comment.id }}" action="/home/{{ post.slug }}/reply" method="post" style="display:none;">
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <div class="d-flex align-items-center mt-2 mb-4 mx-5">
+                            <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" src="/static/pfp/{{ current_user.picture }}" alt="{{ current_user.picture }}" title="{{ current_user.username }}">
+                            <div class="border rounded d-flex">
+                                   <label>
+                                        <input type="text" value="@{{comment.user.username }}" class="form-control border-0" name="message" placeholder="Write a reply..." style="height:100%;" autocomplete="off">
+                                    </label>
+                                <button type="submit" class="btn mt-2 text-primary m-2"><i class="fa-solid fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+                {% for reply in comment.replies %}
+                    <div class="d-flex p-3 mx-5">
+                    <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" alt="{{ reply.user.picture }}" src="/static/pfp/{{ reply.user.picture }}">
+                    <div class="d-flex align-items-center justify-content-between border rounded bg-light d-block p-2 align-items-center">
+                        <div class="flex-column">
+                            <h6 class="mb-3">{{ reply.user.username }}</h6>
+                            <p class="mb-0" title="{{ reply.date.strftime('%B %d, %Y %H:%M ') }}">{{ reply.comment }}</p>
+                        </div>
+                        <div class="flex-column">
+                            <ul class="list-unstyled d-flex m-0">
+                                {% if current_user.is_authenticated %}
+                                    <li class="pb-5 mx-2" style="cursor:pointer;" onclick="showReply({{ reply.id }})">
+                                        <i class="fa-solid fa-reply" title="reply"></i>
+                                    </li>
+                                {% endif %}
+                                {% if current_user.id == reply.user_id or current_user.role == "admin"%}
+                                    <li>
+                                        <div class="dropdown mb-5">
+                                            <i class="fa-solid fa-ellipsis"  data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer"></i>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" onclick="document.querySelector('#delete_{{ reply.id }}').style.display= 'flex'" style="cursor:pointer">
+                                                    <i class="bi bi-trash3-fill"></i> Delete
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                     </div>
-                    <div class="px-2">
-                        <p>This will delete comment</p>
                     </div>
-                    <div>
-                        <form action="/home/{{ post.slug }}/delete/{{ comment.id }}" method="POST">
-                            <button type="button" class="cancel btn btn-light border m-2" onclick="document.querySelector('#delete_{{ comment.id }}').style.display = 'none'">
-                                Cancel
-                            </button>
-                            <button class="delete btn btn-danger border m-2" type="submit">Delete</button>
+                    {% if current_user.is_authenticated %}
+                        <form class="reply-form mx-1" id="reply_{{ reply.id }}" action="/home/{{ post.slug }}/reply" method="post" style="display:none;">
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <div class="d-flex align-items-center mt-2 mb-4 mx-5">
+                                <img class="rounded-circle mx-2" style="height: 50px; width: 50px;" src="/static/pfp/{{ current_user.picture }}" alt="{{ current_user.picture }}" title="{{ current_user.username }}">
+                                <div class="border rounded d-flex">
+                                    <label>
+                                        <input type="text" value="@{{reply.user.username }}" class="form-control border-0" name="message" placeholder="Write a reply..." style="height:100%;" autocomplete="off">
+                                    </label>
+                                    <button type="submit" class="btn mt-2 text-primary m-2"><i class="fa-solid fa-paper-plane"></i></button>
+                                </div>
+                            </div>
                         </form>
+                    {% endif %}
+                    <div class="delete_cont" id="delete_{{ reply.id }}">
+                        <div class="modal-content border rounded">
+                            <div class="delete_txt px-2 pb-4 pt-3">
+                                <h3>Delete Comment?</h3>
+                            </div>
+                            <div class="px-2">
+                                <p>This will delete comment</p>
+                            </div>
+                            <div>
+                                <form action="/home/{{ post.slug }}/delete/{{ reply.id }}" method="POST">
+                                    <button type="button" class="cancel btn btn-light border m-2" onclick="document.querySelector('#delete_{{ reply.id }}').style.display = 'none'">
+                                        Cancel
+                                    </button>
+                                    <button class="delete btn btn-danger border m-2" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="delete_cont" id="delete_{{ comment.id }}">
+                    <div class="modal-content border rounded">
+                        <div class="delete_txt px-2 pb-4 pt-3">
+                            <h3>Delete Comment?</h3>
+                        </div>
+                        <div class="px-2">
+                            <p>This will delete comment</p>
+                        </div>
+                        <div>
+                            <form action="/home/{{ post.slug }}/delete/{{ comment.id }}" method="POST">
+                                <button type="button" class="cancel btn btn-light border m-2" onclick="document.querySelector('#delete_{{ comment.id }}').style.display = 'none'">
+                                    Cancel
+                                </button>
+                                <button class="delete btn btn-danger border m-2" type="submit">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     </div>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+        function showReply(comment_id){
+            let allReplyForms = document.querySelectorAll(".reply-form")
+            allReplyForms.forEach(form =>{
+                if(form.id !== `reply_${comment_id}`){
+                    form.style.display = "none";
+                }
+            })
+            let replyForm = document.getElementById(`reply_${comment_id}`);
+            replyForm.style.display === "none" ? replyForm.style.display = "flex" : replyForm.style.display = "none";
+        }
+    </script>
 {% endblock %}

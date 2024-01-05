@@ -95,6 +95,7 @@ def create():
 def view_blog(blog_slug):
     blog = Blog.query.filter(Blog.slug == blog_slug).first()
     form = AddComment()
+    comments = Comment.query.filter(Comment.blog_id == blog.id, Comment.parent_id.is_(None)).all()
     if blog:
         post = blog
 
@@ -102,10 +103,11 @@ def view_blog(blog_slug):
             new_comment = Comment(comment=form.message.data, blog_id=blog.id, user_id=current_user.id)
             db.session.add(new_comment)
             db.session.commit()
+            return redirect(f"/home/{blog_slug}")
     else:
         flash("Blog with that slug doesn't exist", category="danger")
         return redirect("/")
-    return render_template("blog.html", post=post, form=form)
+    return render_template("blog.html", post=post, form=form, comments=comments)
 
 
 @app.route('/delete/<blog_slug>')
@@ -216,3 +218,17 @@ def search(page_id=1):
     name = request.args['search']
     blogs = Blog.query.filter(Blog.title.ilike(f"%{name}%")).paginate(per_page=6, page=page_id)
     return render_template("results.html", blogs=blogs, page_id=page_id)
+
+
+@app.route('/home/<slug>/reply', methods=['POST'])
+@login_required
+def reply(slug):
+    blog = Blog.query.filter_by(slug=slug).first()
+    parent_id = request.form.get('parent_id')
+    message = request.form.get('message')
+
+    if parent_id and message:
+        new_comment = Comment(comment=message, blog_id=blog.id, user_id=current_user.id, parent_id=parent_id)
+        db.session.add(new_comment)
+        db.session.commit()
+    return redirect(f"/home/{slug}")

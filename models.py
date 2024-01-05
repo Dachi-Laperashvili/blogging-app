@@ -79,11 +79,14 @@ class Comment(db.Model):
     blog = db.relationship('Blog', backref='comments')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User')
+    parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
+    replies = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]))
 
-    def __init__(self, comment, blog_id, user_id):
+    def __init__(self, comment, blog_id, user_id, parent_id=None):
         self.comment = comment
         self.blog_id = blog_id
         self.user_id = user_id
+        self.parent_id = parent_id
 
 
 if __name__ == "__main__":
