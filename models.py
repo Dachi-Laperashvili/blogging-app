@@ -89,6 +89,29 @@ class Comment(db.Model):
         self.parent_id = parent_id
 
 
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String)
+    timestamp = db.Column(db.DateTime, default=datetime.now)
+    to_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    to_user = db.relationship('User', foreign_keys=[to_user_id])
+    from_user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    from_user = db.relationship('User',foreign_keys=[from_user_id])
+    blog_id = db.Column(db.Integer, db.ForeignKey("blog.id"), nullable=True)
+    blog = db.relationship('Blog')
+    comment_id = db.Column(db.Integer, db.ForeignKey("comment.id"), nullable=True)
+    comment = db.relationship('Comment')
+    read_status = db.Column(db.Boolean)
+
+    def __init__(self, content, to_user_id, from_user_id, blog_id=None, comment_id=None, read_status=False):
+        self.content = content
+        self.to_user_id = to_user_id
+        self.from_user_id = from_user_id
+        self.read_status = read_status
+        self.blog_id = blog_id
+        self.comment_id = comment_id
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

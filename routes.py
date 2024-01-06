@@ -2,9 +2,10 @@ from flask import render_template, redirect, flash, request, jsonify
 from forms import SignUp, Login, AddBlog, EditBlog, EditUser, AddComment
 from slugify import slugify
 from extensions import app, db
-from models import User, Blog, Comment
+from models import User, Blog, Comment, Notification
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
+from sqlalchemy import desc
 from os import path
 import uuid
 
@@ -51,8 +52,9 @@ def signup():
         else:
             db.session.add(new_user)
             db.session.commit()
+            login_user(new_user)
             flash("Congratulations, your account has been successfully created.", category="success")
-            return redirect("/login")
+            return redirect("/")
     print(form.errors)
 
     return render_template("signup.html", form=form)
@@ -79,7 +81,7 @@ def create():
 
         form.img.data.save((path.join(app.root_path, 'static/images', random_name)))
         new_blog = Blog(title=form.title.data, slug=slugify(form.slug.data),
-                        content=form.content.data, user_id=current_user.id, image=f"{random_name}.jpg")
+                        content=form.content.data, user_id=current_user.id, image=random_name)
 
         existing_blog = Blog.query.filter(Blog.slug == new_blog.slug).first()
         if existing_blog:
@@ -101,7 +103,10 @@ def view_blog(blog_slug):
 
         if form.validate_on_submit():
             new_comment = Comment(comment=form.message.data, blog_id=blog.id, user_id=current_user.id)
+            new_notification = Notification(content=current_user.username + " commented on your blog:'" + blog.title + ".'",
+                                            to_user_id=blog.user_id, from_user_id=current_user.id,blog_id=blog.id)
             db.session.add(new_comment)
+            db.session.add(new_notification)
             db.session.commit()
             return redirect(f"/home/{blog_slug}")
     else:
@@ -195,8 +200,21 @@ def like_unlike(slug):
         if request.method == 'POST':
             is_liked = request.form.get('is_liked')
             print(is_liked)
-            if is_liked != "true":
+            if is_liked != "true" and current_user not in blog.liked_by:
                 blog.add_like(current_user)
+                if blog.user_id != current_user.id:
+                    existing_notification = Notification.query.filter_by(
+                        content=current_user.username + " liked your post:'" + blog.title + ".'",
+                        to_user_id=blog.user_id, from_user_id=current_user.id, blog_id=blog.id
+                    ).first()
+
+                    if not existing_notification:
+                        new_notification = Notification(content=current_user.username + " liked your post:'" +
+                                                        blog.title + ".'",
+                                                        to_user_id=blog.user_id, from_user_id=current_user.id,
+                                                        blog_id=blog.id)
+                        db.session.add(new_notification)
+                        db.session.commit()
             else:
                 blog.remove_like(current_user)
             return jsonify({"likes": blog.likes, 'liked': current_user in blog.liked_by})
@@ -210,6 +228,10 @@ def delete_comment(blog_slug, comment_id):
     if comment and comment.user_id == current_user.id or current_user.role == "admin":
         db.session.delete(comment)
         db.session.commit()
+        if comment.replies:
+            for reply_comment in comment.replies:
+                db.session.delete(reply_comment)
+                db.session.commit()
     return redirect(f"/home/{blog_slug}")
 
 
@@ -225,10 +247,65 @@ def search(page_id=1):
 def reply(slug):
     blog = Blog.query.filter_by(slug=slug).first()
     parent_id = request.form.get('parent_id')
+    comment = Comment.query.get(parent_id)
+    parent_user = request.form.get('parent_user')
+    reply_id = request.form.get('reply_id')
+    reply_user = request.form.get('reply_user')
     message = request.form.get('message')
 
     if parent_id and message:
         new_comment = Comment(comment=message, blog_id=blog.id, user_id=current_user.id, parent_id=parent_id)
+        if parent_user != current_user:
+            new_notification = Notification(content=current_user.username + " replied to your comment:'" +
+                                            comment.comment + ".'",
+                                            to_user_id=parent_user, from_user_id=current_user.id, comment_id=parent_id)
+            db.session.add(new_notification)
         db.session.add(new_comment)
         db.session.commit()
+
+    if reply_id and reply_user != current_user.id:
+        new_notification = Notification(content=current_user.username + " replied to your comment.",
+                                        to_user_id=reply_user, from_user_id=current_user.id, comment_id=reply_id)
+        db.session.add(new_notification)
+        db.session.commit()
     return redirect(f"/home/{slug}")
+
+
+@app.route('/get-notifications', methods=['GET'])
+@login_required
+def get_notifications():
+    notifications = (Notification.query.filter_by(to_user_id=current_user.id)
+                     .order_by(desc(Notification.timestamp)).all())
+    unread_count = Notification.query.filter_by(to_user_id=current_user.id, read_status=False).count()
+
+    formatted_notification = [{'content': notification.content,
+                               'id': notification.id,
+                               'timestamp': notification.timestamp.strftime("%d %b %Y %H:%M"),
+                               'user_picture': notification.from_user.picture,
+                               'read_status': notification.read_status}
+                              for notification in notifications]
+
+    return jsonify({'notifications': formatted_notification, 'unread_count': unread_count})
+
+
+@app.route('/mark-read', methods=['POST'])
+def mark_read():
+    notification_id = request.json.get('notification_id')
+    notification = Notification.query.get(notification_id)
+    notifications = (Notification.query.filter_by(to_user_id=current_user.id)
+                     .order_by(desc(Notification.timestamp)).all())
+    unread_count = Notification.query.filter_by(to_user_id=current_user.id, read_status=False).count()
+
+    formatted_notification = [{'content': notification.content,
+                               'id': notification.id,
+                               'timestamp': notification.timestamp.strftime("%d %b %Y %H:%M"),
+                               'user_picture': notification.from_user.picture,
+                               'read_status': notification.read_status}
+                              for notification in notifications]
+    if notification and notification.to_user_id == current_user.id:
+        notification.read_status = True
+        db.session.commit()
+        return jsonify({'message': 'Notification marked as read!',
+                        'notifications': formatted_notification, 'unread_count': unread_count})
+    return jsonify({'message': 'Notification not found or unauthorized',
+                    'notifications': formatted_notification, 'unread_count': unread_count})
